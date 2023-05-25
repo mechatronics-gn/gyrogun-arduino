@@ -87,20 +87,5 @@ void loop() {
   esp.write(packet, 16);
   delay(5);
 
-  /*
-  if(!wifi.send(packet, 16)) {
-    Serial.println("send failure, trying to reconnect");
-    while(true) {
-      if(wifi.createTCP(HOST_IP, HOST_PORT)) {
-        Serial.println("reconnection successful");
-        break;
-      } else {
-        Serial.println("reconnection failed, will try again in 3 secs...");
-        delay(3000);
-      }
-    }
-  }
-  */
-
   Serial.println(message_type);
 }
