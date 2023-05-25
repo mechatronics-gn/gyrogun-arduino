@@ -1,4 +1,3 @@
-#include "ESP8266.h"
 #include <SoftwareSerial.h>
 #include "secrets.h"
 
@@ -7,22 +6,13 @@
 #define ESP_TX 3
 #define SWITCH 4
 
-SoftwareSerial esp_serial(ESP_TX, ESP_RX);
-ESP8266 wifi(esp_serial);
+SoftwareSerial esp(ESP_TX, ESP_RX);
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
+  esp.begin(115200);
 
   pinMode(SWITCH, INPUT_PULLUP);
-  
-  wifi.setOprToStationSoftAP();
-
-  wifi.joinAP(MECHANET_SSID, MECHANET_PW);
-  Serial.println(wifi.getLocalIP().c_str());
-  
-  wifi.disableMUX();
-
-  wifi.createTCP(HOST_IP, HOST_PORT);
 }
 
 int switch_state = 0;
@@ -77,7 +67,27 @@ void loop() {
   packet[13] = roll_uint >> 16 % 256;
   packet[14] = roll_uint >> 8 % 256;
   packet[15] = roll_uint >> 0 % 256;
-    
+
+  bool esp_ok = false;
+  while(esp.available() || !esp_ok) {
+    if(!esp.available()) continue;
+    char val = esp.read();
+    if(val == 1) {
+      Serial.println("ESP OK");
+      esp_ok = true;
+      break;      
+    } else if (val == 0) {
+      Serial.println("ESP failure");
+      esp_ok = false;
+    } else {
+      Serial.print(val);
+    }
+  } 
+
+  esp.write(packet, 16);
+  delay(5);
+
+  /*
   if(!wifi.send(packet, 16)) {
     Serial.println("send failure, trying to reconnect");
     while(true) {
@@ -90,6 +100,7 @@ void loop() {
       }
     }
   }
+  */
 
-  delay(50);
+  Serial.println(message_type);
 }
