@@ -1,6 +1,4 @@
 #include <SoftwareSerial.h>
-#include "secrets.h"
-
 
 #define ESP_RX 2
 #define ESP_TX 3
@@ -78,6 +76,7 @@ void loop() {
       break;      
     } else if (val == 0) {
       Serial.println("ESP failure");
+      esp.flush();
       esp_ok = false;
     } else {
       Serial.print(val);
